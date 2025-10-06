@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
-using ServerMonitoring.Shared.Interfaces;
-using ServerMonitoring.Shared.Models;
+using MonitoringSystem.Shared.Interfaces;
+using MonitoringSystem.Shared.Models;
 using Microsoft.Extensions.Options;
 using MonitoringSystem.Processor.Models;
 
-namespace ServerMonitoring.Processor.Services;
+namespace MonitoringSystem.Processor.Services;
 
 public class AnomalyDetector
 {

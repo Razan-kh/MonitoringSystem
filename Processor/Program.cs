@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using ServerMonitoring.Shared.Interfaces;
-using ServerMonitoring.Processor.Services;
+using MonitoringSystem.Shared.Interfaces;
+using MonitoringSystem.Processor.Services;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
@@ -12,7 +12,7 @@ var host = Host.CreateDefaultBuilder(args)
 
         const string defaultRabbitHost = "localhost";
         const string defaultMongoConn = "mongodb://localhost:27017";
-        const string defaultMongoDb = "ServerMonitoringDb";
+        const string defaultMongoDb = "MonitoringSystemDb";
         const string defaultHubUrl = "http://localhost:5000/alertsHub";
 
         // Read configuration with fallback

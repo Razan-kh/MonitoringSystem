@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
-using ServerMonitoring.Shared.Interfaces;
-using ServerMonitoring.Shared.Models;
+using MonitoringSystem.Shared.Interfaces;
+using MonitoringSystem.Shared.Models;
 
-namespace ServerMonitoring.Processor.Services;
+namespace MonitoringSystem.Processor.Services;
 
 public class SignalRNotifier : ISignalRNotifier
 {

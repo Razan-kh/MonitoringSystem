@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using ServerMonitoring.Shared.Models;
-using ServerMonitoring.Shared.Interfaces;
+using MonitoringSystem.Shared.Models;
+using MonitoringSystem.Shared.Interfaces;
 using Microsoft.Extensions.Options;
 
-namespace ServerMonitoring.Processor.Services;
+namespace MonitoringSystem.Processor.Services;
 
 public class ProcessorHostedService : BackgroundService
 {

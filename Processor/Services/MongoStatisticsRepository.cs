@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using ServerMonitoring.Shared.Interfaces;
-using ServerMonitoring.Shared.Models;
+using MonitoringSystem.Shared.Interfaces;
+using MonitoringSystem.Shared.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ServerMonitoring.Processor.Services;
+namespace MonitoringSystem.Processor.Services;
 
 public class MongoStatisticsRepository : IStatisticsRepository
 {

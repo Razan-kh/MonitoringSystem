@@ -3,9 +3,9 @@ using System.Text;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using ServerMonitoring.Shared.Interfaces;
+using MonitoringSystem.Shared.Interfaces;
 
-namespace ServerMonitoring.Processor.Services;
+namespace MonitoringSystem.Processor.Services;
 
 public class RabbitMqConsumer : IMessageConsumer
 {
