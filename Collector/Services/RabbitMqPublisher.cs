@@ -15,11 +15,12 @@ public class RabbitMqPublisher : IMessagePublisher
         _factory = new ConnectionFactory() { HostName = hostName };
     }
 
-    public Task PublishAsync(Message message)
+    public Task PublishAsync<T>(Message message)
     {
         using var connection = _factory.CreateConnection();
         using var channel = connection.CreateModel();
-        var body = Encoding.UTF8.GetBytes(message.Content);
+        var json = JsonSerializer.Serialize(message);
+        var body = Encoding.UTF8.GetBytes(json);
 
         channel.BasicPublish(message.Exchange, message.Topic, null, body);
 
