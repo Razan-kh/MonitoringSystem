@@ -1,15 +1,13 @@
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using MonitoringSystem.Collector.Interfaces;
+using MonitoringSystem.Collector.Models;
 using MonitoringSystem.Shared.Models;
 using MonitoringSystem.Shared.Interfaces;
-using MonitoringSystem.Collector.Models;
 
 namespace MonitoringSystem.Collector.Services;
 
@@ -20,8 +18,11 @@ public class StatisticsCollectorService : BackgroundService
     private readonly CpuUsageCollector _cpuCollector;
     private readonly MemoryUsageCollector _memoryCollector;
 
-    public StatisticsCollectorService(IMessagePublisher publisher, IOptions<CollectorConfig> options, CpuUsageCollector cpuCollector,
-            MemoryUsageCollector memoryCollector)
+    public StatisticsCollectorService(
+        IMessagePublisher publisher,
+        IOptions<CollectorConfig> options,
+        CpuUsageCollector cpuCollector,
+        MemoryUsageCollector memoryCollector)
     {
         _publisher = publisher;
         _config = options.Value;
@@ -36,15 +37,12 @@ public class StatisticsCollectorService : BackgroundService
             try
             {
                 var stats = Collect();
-                var topic = $"ServerStatistics.{_config.ServerIdentifier}";
-                var payload = JsonConvert.SerializeObject(stats);
-                var exchange = "ServerStatsExchange";
-                await _publisher.PublishAsync(topic, payload, exchange);
-                Console.WriteLine($"Published stats for {_config.ServerIdentifier} at {DateTime.UtcNow}");
+                //Console.WriteLine(stats.CpuUsage + " " + stats.AvailableMemory + " " + stats.MemoryUsage);
+                await PublishStatisticsAsync(stats);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error collecting statistics: {ex.Message}");
+                Console.WriteLine($"Error collecting or publishing statistics: {ex.Message}");
             }
 
             await Task.Delay(TimeSpan.FromSeconds(_config.SamplingIntervalSeconds), stoppingToken);
@@ -53,16 +51,63 @@ public class StatisticsCollectorService : BackgroundService
 
     private ServerStatistics Collect()
     {
-        var cpu = _cpuCollector.GetCpuUsage();
-        var (used, available) = _memoryCollector.GetMemoryUsage();
-
+        var cpuUsage = GetCpuUsageSafe();
+        var memoryUsage = GetMemoryUsageSafe();
+Console.WriteLine(_config.SamplingIntervalSeconds);
         return new ServerStatistics
         {
             ServerIdentifier = _config.ServerIdentifier,
-            MemoryUsage = used,
-            AvailableMemory = available,
-            CpuUsage = cpu,
+            CpuUsage = cpuUsage,
+            MemoryUsage = memoryUsage.UsedMB,
+            AvailableMemory = memoryUsage.AvailableMB,
             Timestamp = DateTime.UtcNow
         };
+    }
+
+    private double GetCpuUsageSafe()
+    {
+        try
+        {
+            return _cpuCollector.GetCpuUsage();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"CPU usage collection failed: {ex.Message}");
+            throw;
+        }
+    }
+
+    private MemoryUsage GetMemoryUsageSafe()
+    {
+        try
+        {
+            return _memoryCollector.GetMemoryUsage();
+        }
+        catch (MemoryUsageException mex)
+        {
+            Console.WriteLine($"Memory usage collection failed: {mex.Message}");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Unexpected error during memory collection: {ex.Message}");
+            throw;
+        }
+    }
+
+    private async Task PublishStatisticsAsync(ServerStatistics stats)
+    {
+        var topic = $"ServerStatistics.{_config.ServerIdentifier}";
+        var payload = JsonConvert.SerializeObject(stats);
+        var exchange = "ServerStatsExchange";
+        var message = new Message
+        {
+            Topic = topic,
+            Content = payload,
+            Exchange = exchange
+        };
+
+        await _publisher.PublishAsync(message);
+        Console.WriteLine($"Published stats for {_config.ServerIdentifier} at {DateTime.UtcNow}");
     }
 }

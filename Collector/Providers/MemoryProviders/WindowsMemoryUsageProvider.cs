@@ -8,7 +8,7 @@ namespace MonitoringSystem.Collector.Providers.MemoryProviders;
 
 public class WindowsMemoryUsageProvider : IMemoryUsageProvider
 {
-    public (double usedMB, double availableMB) GetMemoryUsage()
+    public MemoryUsage GetMemoryUsage()
     {
         try
         {
@@ -16,34 +16,18 @@ public class WindowsMemoryUsageProvider : IMemoryUsageProvider
             var availableMB = availableCounter.NextValue();
             var totalMemory = GetWindowsTotalMemoryMB();
             var usedMB = totalMemory - availableMB;
-            return (Math.Round(usedMB, 2), Math.Round(availableMB, 2));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Windows memory counter failed: {ex.Message}");
-            return GetMemoryUsageFallback();
-        }
-    }
 
-    private static (double usedMB, double availableMB) GetMemoryUsageFallback()
-    {
-        try
-        {
-            var memStatus = new MEMORYSTATUSEX();
-            if (GlobalMemoryStatusEx(memStatus))
+            if (usedMB < 0)
             {
-                var totalMB = memStatus.ullTotalPhys / (1024.0 * 1024.0);
-                var availableMB = memStatus.ullAvailPhys / (1024.0 * 1024.0);
-                var usedMB = totalMB - availableMB;
-                return (Math.Round(usedMB, 2), Math.Round(availableMB, 2));
+                throw new MemoryUsageException("Used memory calculated as negative.");
             }
+
+            return new MemoryUsage(Math.Round(usedMB, 2), Math.Round(availableMB, 2));
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Windows memory API failed: {ex.Message}");
+            throw new MemoryUsageException("Failed to read Windows memory usage.", ex);
         }
-
-        return (0, 0);
     }
 
     private static double GetWindowsTotalMemoryMB()
@@ -59,9 +43,10 @@ public class WindowsMemoryUsageProvider : IMemoryUsageProvider
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to get total memory: {ex.Message}");
+            throw new MemoryUsageException("Failed to read Windows memory usage.", ex);
         }
 
-        return 8192; // 8GB default fallback
+        return 8192;
     }
 
     [return: MarshalAs(UnmanagedType.Bool)]

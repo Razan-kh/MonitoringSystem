@@ -16,9 +16,9 @@ public class WindowsCpuUsageProvider : ICpuUsageProvider
             Thread.Sleep(1000);
             return Math.Round(cpuCounter.NextValue(), 2);
         }
-        catch
+        catch (Exception ex)
         {
-            return 0.0;
+            throw new CpuUsageException("Failed to read Windows CPU usage.", ex);
         }
     }
 }

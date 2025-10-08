@@ -30,16 +30,15 @@ public class LinuxCpuUsageProvider : ICpuUsageProvider
             ulong system2 = ulong.Parse(cpuLine[3]);
             ulong idle2 = ulong.Parse(cpuLine[4]);
             ulong total2 = user2 + nice2 + system2 + idle2;
-
             ulong totalDelta = total2 - total1;
             ulong idleDelta = idle2 - idle;
-
             double cpuUsage = 100.0 * (totalDelta - idleDelta) / totalDelta;
+            
             return Math.Round(cpuUsage, 2);
         }
-        catch
+        catch (Exception ex)
         {
-            return 0.0;
+            throw new CpuUsageException("Failed to read Linux CPU usage.", ex);
         }
     }
 }

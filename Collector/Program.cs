@@ -10,15 +10,19 @@ var host = Host.CreateDefaultBuilder(args)
             {
                 var configuration = context.Configuration;
 
-                services.Configure<CollectorConfig>(configuration.GetSection("CollectorConfig"));
+                _ = services.Configure<CollectorConfig>(configuration.GetSection("ServerStatisticsConfig"));
 
                 // Get hostName from configuration with fallback
-                var hostName = configuration["RabbitMQ:HostName"] ?? "localhost";
+                var hostName = configuration["RabbitMQ:HostName"];
+                var exchangeName = configuration["RabbitMQ:ExchangeName"];
 
-                services.AddSingleton<IMessagePublisher>(provider =>
-                    new RabbitMqPublisher(hostName));
+                _ = services.AddSingleton<CpuUsageCollector>();
+                _ = services.AddSingleton<MemoryUsageCollector>();
 
-                services.AddHostedService<StatisticsCollectorService>();
+                _ = services.AddSingleton<IMessagePublisher>(provider =>
+                    new RabbitMqPublisher(hostName, exchangeName));
+
+                _ = services.AddHostedService<StatisticsCollectorService>();
             })
             .Build();
 

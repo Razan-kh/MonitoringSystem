@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using MonitoringSystem.Collector.Providers;
 using MonitoringSystem.Collector.Interfaces;
 using MonitoringSystem.Collector.Providers.CpuProviders;
 
@@ -22,9 +21,20 @@ public class CpuUsageCollector
         }
         else
         {
-            _provider = new UnsupportedCpuUsageProvider();
+            throw new PlatformNotSupportedException(
+                $"CPU usage collection is not supported on this platform: {RuntimeInformation.OSDescription}");
         }
     }
 
-    public double GetCpuUsage() => _provider.GetCpuUsage();
+    public double GetCpuUsage()
+    {
+        try
+        {
+            return _provider.GetCpuUsage();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to get CPU usage.", ex);
+        }
+    }
 }
