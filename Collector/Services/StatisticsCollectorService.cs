@@ -98,12 +98,11 @@ Console.WriteLine(_config.SamplingIntervalSeconds);
     private async Task PublishStatisticsAsync(ServerStatistics stats)
     {
         var topic = $"ServerStatistics.{_config.ServerIdentifier}";
-        var payload = JsonConvert.SerializeObject(stats);
         var exchange = "ServerStatsExchange";
-        var message = new Message
+        var message = new Message<ServerStatistics>
         {
             Topic = topic,
-            Content = payload,
+            Content = stats,
             Exchange = exchange
         };
 
