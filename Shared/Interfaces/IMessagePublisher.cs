@@ -1,8 +1,9 @@
 using System.Threading.Tasks;
+using MonitoringSystem.Shared.Models;
 
 namespace MonitoringSystem.Shared.Interfaces;
 
 public interface IMessagePublisher
 {
-    Task PublishAsync(string topic, string payload, string exchange);
+    Task PublishAsync(Message message);
 }
