@@ -47,7 +47,7 @@ public class RabbitMqConsumer : IMessageConsumer
                 }
                 else
                 {
-                    // Handle deserialization error
+                    Console.WriteLine("Failed to deserialize message or content is null");
                     _channel.BasicNack(ea.DeliveryTag, multiple: false, requeue: false);
                 }
             }
