@@ -5,5 +5,5 @@ namespace MonitoringSystem.Shared.Interfaces;
 
 public interface IMessagePublisher
 {
-    Task PublishAsync(Message message);
+    Task PublishAsync<T>(Message<T> message);
 }
