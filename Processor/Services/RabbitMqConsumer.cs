@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using MonitoringSystem.Shared.Interfaces;
+using MonitoringSystem.Shared.Models;
+using System.Text.Json;
 
 namespace MonitoringSystem.Processor.Services;
 
@@ -21,7 +23,7 @@ public class RabbitMqConsumer : IMessageConsumer
         _exchangeName = exchangeName;
     }
 
-    public Task StartAsync(string topicPattern, Func<string, Task> messageHandler)
+    public Task StartAsync<T>(string topicPattern, Func<Message<T>, Task> messageHandler)
     {
         _connection = _factory.CreateConnection();
         _channel = _connection.CreateModel();
@@ -35,8 +37,27 @@ public class RabbitMqConsumer : IMessageConsumer
         {
             var body = ea.Body.ToArray();
             var json = Encoding.UTF8.GetString(body);
-            await messageHandler(json);
-            _channel.BasicAck(ea.DeliveryTag, multiple: false);
+            try
+            {
+                var message = JsonSerializer.Deserialize<Message<T>>(json);
+                if (message != null)
+                {
+                    await messageHandler(message);
+                    _channel.BasicAck(ea.DeliveryTag, multiple: false);
+                }
+                else
+                {
+                    // Handle deserialization error
+                    _channel.BasicNack(ea.DeliveryTag, multiple: false, requeue: false);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle processing error
+                _channel.BasicNack(ea.DeliveryTag, multiple: false, requeue: false);
+                // Log the exception
+                Console.WriteLine($"Error processing message: {ex.Message}");
+            }
         };
 
         _channel.BasicConsume(_queueName, autoAck: false, consumer: consumer);

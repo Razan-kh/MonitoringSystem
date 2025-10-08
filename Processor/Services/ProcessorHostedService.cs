@@ -23,12 +23,11 @@ public class ProcessorHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _consumer.StartAsync("ServerStatistics.*", async json =>
+        await _consumer.StartAsync<ServerStatistics>("ServerStatistics.*", async message =>
         {
-            var stats = JsonConvert.DeserializeObject<ServerStatistics>(json);
-            if (stats != null)
+            if (message.Content != null)
             {
-                await _detector.ProcessAsync(stats);
+                await _detector.ProcessAsync(message.Content);
             }
         });
 
