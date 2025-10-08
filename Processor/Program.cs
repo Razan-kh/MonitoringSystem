@@ -4,38 +4,34 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using MonitoringSystem.Shared.Interfaces;
 using MonitoringSystem.Processor.Services;
+using MonitoringSystem.Processor.Models;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         var configuration = context.Configuration;
 
-        const string defaultRabbitHost = "localhost";
-        const string defaultMongoConn = "mongodb://localhost:27017";
-        const string defaultMongoDb = "MonitoringSystemDb";
-        const string defaultHubUrl = "http://localhost:5000/alertsHub";
-
-        // Read configuration with fallback
-        var rabbitHost = configuration["RabbitMQ:HostName"] ?? defaultRabbitHost;
-        var mongoConn = configuration["MongoDB:ConnectionString"] ?? defaultMongoConn;
-        var mongoDb = configuration["MongoDB:Database"] ?? defaultMongoDb;
-        var hubUrl = configuration["SignalR:HubUrl"] ?? defaultHubUrl;
+        var rabbitHost = configuration["RabbitMQ:HostName"];
+        var exchangeName = configuration["RabbitMQ:ExchangeName"];
+        var mongoConn = configuration["MongoDB:ConnectionString"];
+        var mongoDb = configuration["MongoDB:Database"];
+        var hubUrl = configuration["SignalR:HubUrl"];
 
         // Register services with DI
-        services.AddSingleton<IMessageConsumer>(provider =>
-            new RabbitMqConsumer(rabbitHost));
+        _ = services.AddSingleton<IMessageConsumer>(provider =>
+            new RabbitMqConsumer(rabbitHost, exchangeName));
 
-        services.AddSingleton<IStatisticsRepository>(provider =>
+        _ = services.AddSingleton<IStatisticsRepository>(provider =>
             new MongoStatisticsRepository(mongoConn, mongoDb));
 
-        services.AddSingleton<ISignalRNotifier>(provider =>
+        _ = services.AddSingleton<ISignalRNotifier>(provider =>
             new SignalRNotifier(hubUrl));
 
         // Anomaly config binding
-        services.Configure<AnomalyConfig>(configuration.GetSection("AnomalyConfig"));
-
+        _ = services.Configure<AnomalyConfig>(configuration.GetSection("AnomalyConfig"));
+        _ = services.AddSingleton<AnomalyDetector>();
         // Register hosted service
-        services.AddHostedService<ProcessorHostedService>();
+        _ = services.AddHostedService<ProcessorHostedService>();
     })
     .Build();
 

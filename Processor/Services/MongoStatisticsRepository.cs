@@ -10,18 +10,16 @@ namespace MonitoringSystem.Processor.Services;
 public class MongoStatisticsRepository : IStatisticsRepository
 {
     private readonly IMongoCollection<ServerStatistics> _collection;
+    private readonly string _collectionName = "statistics";
 
     public MongoStatisticsRepository(string connectionString, string database)
     {
         var client = new MongoClient(connectionString);
         var db = client.GetDatabase(database);
-        _collection = db.GetCollection<ServerStatistics>("statistics");
+        _collection = db.GetCollection<ServerStatistics>(_collectionName);
     }
 
-    public async Task InsertAsync(ServerStatistics stats)
-    {
-        await _collection.InsertOneAsync(stats);
-    }
+    public async Task InsertAsync(ServerStatistics stats) => await _collection.InsertOneAsync(stats);
 
     public async Task<ServerStatistics> GetPreviousAsync(string serverIdentifier)
     {

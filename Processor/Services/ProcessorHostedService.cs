@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using MonitoringSystem.Shared.Models;
 using MonitoringSystem.Shared.Interfaces;
 using Microsoft.Extensions.Options;
+using MonitoringSystem.Processor.Models;
 
 namespace MonitoringSystem.Processor.Services;
 
@@ -14,10 +15,10 @@ public class ProcessorHostedService : BackgroundService
     private readonly IMessageConsumer _consumer;
     private readonly AnomalyDetector _detector;
 
-    public ProcessorHostedService(IMessageConsumer consumer, IStatisticsRepository repo, ISignalRNotifier notifier, IOptions<AnomalyConfig> opts)
+    public ProcessorHostedService(IMessageConsumer consumer, AnomalyDetector detector)
     {
         _consumer = consumer;
-        _detector = new AnomalyDetector(repo, notifier, opts);
+        _detector = detector;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

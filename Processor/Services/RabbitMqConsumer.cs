@@ -15,7 +15,7 @@ public class RabbitMqConsumer : IMessageConsumer
     private IModel? _channel;
     private string? _queueName;
 
-    public RabbitMqConsumer(string hostName, string exchangeName = "ServerStatisticsExchange")
+    public RabbitMqConsumer(string hostName, string exchangeName)
     {
         _factory = new ConnectionFactory() { HostName = hostName };
         _exchangeName = exchangeName;
