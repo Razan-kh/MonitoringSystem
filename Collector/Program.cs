@@ -6,6 +6,11 @@ using MonitoringSystem.Collector.Models;
 using MonitoringSystem.Shared.Interfaces;
 
 var host = Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                // Add support for environment variables
+                _ = config.AddEnvironmentVariables();
+            })
             .ConfigureServices((context, services) =>
             {
                 var configuration = context.Configuration;
