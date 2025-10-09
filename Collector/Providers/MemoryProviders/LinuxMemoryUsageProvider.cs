@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+
+using MonitoringSystem.Collector.Exceptions;
 using MonitoringSystem.Collector.Interfaces;
 using MonitoringSystem.Collector.Models;
 

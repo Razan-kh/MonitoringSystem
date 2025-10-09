@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Threading;
+
+using MonitoringSystem.Collector.Exceptions;
 using MonitoringSystem.Collector.Interfaces;
 
 namespace MonitoringSystem.Collector.Providers.CpuProviders;

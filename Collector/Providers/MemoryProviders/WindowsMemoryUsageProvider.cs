@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+
+using MonitoringSystem.Collector.Exceptions;
 using MonitoringSystem.Collector.Interfaces;
 using MonitoringSystem.Collector.Models;
 

@@ -8,6 +8,7 @@ using MonitoringSystem.Collector.Interfaces;
 using MonitoringSystem.Collector.Models;
 using MonitoringSystem.Shared.Models;
 using MonitoringSystem.Shared.Interfaces;
+using MonitoringSystem.Collector.Exceptions;
 
 namespace MonitoringSystem.Collector.Services;
 
