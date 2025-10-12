@@ -99,7 +99,7 @@ Console.WriteLine(_config.SamplingIntervalSeconds);
     private async Task PublishStatisticsAsync(ServerStatistics stats)
     {
         var topic = $"ServerStatistics.{_config.ServerIdentifier}";
-        var exchange = "ServerStatsExchange";
+        var exchange = "ServerStatisticsExchange";
         var message = new Message<ServerStatistics>
         {
             Topic = topic,

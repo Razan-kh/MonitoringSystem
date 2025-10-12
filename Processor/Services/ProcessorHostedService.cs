@@ -23,16 +23,18 @@ public class ProcessorHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _consumer.StartAsync<ServerStatistics>("ServerStatistics.*", async message =>
-        {
-            if (message.Content != null)
-            {
-                await _detector.ProcessAsync(message.Content);
-            }
-        });
-
         while (!stoppingToken.IsCancellationRequested)
         {
+            await _consumer.StartAsync<ServerStatistics>("ServerStatistics.*", async message =>
+            {
+                System.Console.WriteLine("inside execute ");
+                if (message.Content != null)
+                {   
+                    System.Console.WriteLine("inside execute async");
+                    await _detector.ProcessAsync(message.Content);
+                }
+            });
+
             await Task.Delay(1000, stoppingToken);
         }
         await _consumer.StopAsync();
