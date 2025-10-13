@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
-
 using MonitoringSystem.Shared.Models;
+
+namespace MonitoringSystem.SignalRHub;
 
 public class AlertsHub : Hub
 {
