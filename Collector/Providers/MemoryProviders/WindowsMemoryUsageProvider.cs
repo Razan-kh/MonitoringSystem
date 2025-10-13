@@ -1,13 +1,14 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
+using System.Runtime.Versioning;
 using MonitoringSystem.Collector.Exceptions;
 using MonitoringSystem.Collector.Interfaces;
 using MonitoringSystem.Collector.Models;
 
 namespace MonitoringSystem.Collector.Providers.MemoryProviders;
 
+[SupportedOSPlatform("windows")]
 public class WindowsMemoryUsageProvider : IMemoryUsageProvider
 {
     public MemoryUsage GetMemoryUsage()

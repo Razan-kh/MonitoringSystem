@@ -1,12 +1,13 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
-
+using System.Runtime.Versioning;
 using MonitoringSystem.Collector.Exceptions;
 using MonitoringSystem.Collector.Interfaces;
 
 namespace MonitoringSystem.Collector.Providers.CpuProviders;
 
+[SupportedOSPlatform("windows")]
 public class WindowsCpuUsageProvider : ICpuUsageProvider
 {
     public double GetCpuUsage()

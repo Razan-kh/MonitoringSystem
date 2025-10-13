@@ -54,14 +54,13 @@ public class StatisticsCollectorService : BackgroundService
     {
         var cpuUsage = GetCpuUsageSafe();
         var memoryUsage = GetMemoryUsageSafe();
-Console.WriteLine(_config.SamplingIntervalSeconds);
         return new ServerStatistics
         {
             ServerIdentifier = _config.ServerIdentifier,
             CpuUsage = cpuUsage,
             MemoryUsage = memoryUsage.UsedMB,
             AvailableMemory = memoryUsage.AvailableMB,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.Now
         };
     }
 
@@ -108,6 +107,6 @@ Console.WriteLine(_config.SamplingIntervalSeconds);
         };
 
         await _publisher.PublishAsync(message);
-        Console.WriteLine($"Published stats for {_config.ServerIdentifier} at {DateTime.UtcNow}");
+        Console.WriteLine($"Published stats for {_config.ServerIdentifier} at {DateTime.Now}");
     }
 }

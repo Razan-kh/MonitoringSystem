@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using MonitoringSystem.Collector.Interfaces;
+using MonitoringSystem.Collector.Exceptions;
 using MonitoringSystem.Collector.Providers.CpuProviders;
 
 namespace MonitoringSystem.Collector.Services;
@@ -32,9 +33,9 @@ public class CpuUsageCollector
         {
             return _provider.GetCpuUsage();
         }
-        catch (Exception ex)
+        catch (MonitoringException ex)
         {
-            throw new Exception("Failed to get CPU usage.", ex);
+            throw new MemoryUsageException("Failed to read Windows memory usage.", ex);
         }
     }
 }

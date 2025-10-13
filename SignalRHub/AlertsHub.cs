@@ -7,7 +7,7 @@ public class AlertsHub : Hub
 {
     public async Task SendAlert(AlertMessage message)
     {
-        Console.WriteLine($"Alert recieved {message}");
+        Console.WriteLine($"Alert recieved from {message.ServerIdentifier} of type {message.Type} {message.Description} at {message.Timestamp}");
         await Clients.All.SendAsync("ReceiveAlert", message);
     }
 }

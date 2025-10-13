@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using MonitoringSystem.Collector.Interfaces;
 using MonitoringSystem.Collector.Models;
 using MonitoringSystem.Collector.Providers.MemoryProviders;
+using MonitoringSystem.Collector.Exceptions;
 
 namespace MonitoringSystem.Collector.Services;
 
@@ -33,9 +34,9 @@ public class MemoryUsageCollector
         {
             return _provider.GetMemoryUsage();
         }
-        catch (Exception ex)
+        catch (MonitoringException ex)
         {
-            throw new Exception("Failed to get memory usage.", ex);
+            throw new MemoryUsageException("Failed to read Windows memory usage.", ex);
         }
     }
 }

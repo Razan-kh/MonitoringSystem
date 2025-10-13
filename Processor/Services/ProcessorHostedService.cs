@@ -27,15 +27,14 @@ public class ProcessorHostedService : BackgroundService
         {
             await _consumer.StartAsync<ServerStatistics>("ServerStatistics.*", async message =>
             {
-                System.Console.WriteLine("inside execute ");
                 if (message.Content != null)
                 {   
-                    System.Console.WriteLine("inside execute async");
+                    Console.WriteLine(message.Content.ServerIdentifier);
                     await _detector.ProcessAsync(message.Content);
                 }
             });
 
-            await Task.Delay(1000, stoppingToken);
+            await Task.Delay(9000, stoppingToken);
         }
         await _consumer.StopAsync();
     }
