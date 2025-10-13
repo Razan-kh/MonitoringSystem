@@ -25,8 +25,6 @@ public class RabbitMqConsumer : IMessageConsumer
 
     public Task StartAsync<T>(string topicPattern, Func<Message<T>, Task> messageHandler)
     {
-        Console.WriteLine("inside start async");
-
         _connection = _factory.CreateConnection();
         _channel = _connection.CreateModel();
 
@@ -36,14 +34,12 @@ public class RabbitMqConsumer : IMessageConsumer
 
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += async (sender, ea) =>
-        {System.Console.WriteLine("recieved");
+        {
             var body = ea.Body.ToArray();
             var json = Encoding.UTF8.GetString(body);
             try
             {
-                Console.WriteLine("inside try");
                 var message = JsonSerializer.Deserialize<Message<T>>(json); 
-                Console.WriteLine("after serialize");
 
                 if (message != null)
                 {
@@ -66,7 +62,6 @@ public class RabbitMqConsumer : IMessageConsumer
 
         _channel.BasicConsume(queue: _queueName, autoAck: false, consumer: consumer);
 
-        Console.WriteLine("consumer started and waiting for messages...");
         return Task.CompletedTask;
     }
 
