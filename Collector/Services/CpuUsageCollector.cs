@@ -35,7 +35,7 @@ public class CpuUsageCollector
         }
         catch (MonitoringException ex)
         {
-            throw new MemoryUsageException("Failed to read Windows memory usage.", ex);
+            throw new CpuUsageException("Failed to read Windows memory usage.", ex);
         }
     }
 }

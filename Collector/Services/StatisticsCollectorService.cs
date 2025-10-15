@@ -9,6 +9,7 @@ using MonitoringSystem.Collector.Models;
 using MonitoringSystem.Shared.Models;
 using MonitoringSystem.Shared.Interfaces;
 using MonitoringSystem.Collector.Exceptions;
+using Microsoft.Extensions.Configuration;
 
 namespace MonitoringSystem.Collector.Services;
 
@@ -38,7 +39,6 @@ public class StatisticsCollectorService : BackgroundService
             try
             {
                 var stats = Collect();
-                //Console.WriteLine(stats.CpuUsage + " " + stats.AvailableMemory + " " + stats.MemoryUsage);
                 await PublishStatisticsAsync(stats);
             }
             catch (Exception ex)
@@ -52,8 +52,8 @@ public class StatisticsCollectorService : BackgroundService
 
     private ServerStatistics Collect()
     {
-        var cpuUsage = GetCpuUsageSafe();
-        var memoryUsage = GetMemoryUsageSafe();
+        var cpuUsage = GetCpuUsage();
+        var memoryUsage = GetMemoryUsage();
         return new ServerStatistics
         {
             ServerIdentifier = _config.ServerIdentifier,
@@ -64,7 +64,7 @@ public class StatisticsCollectorService : BackgroundService
         };
     }
 
-    private double GetCpuUsageSafe()
+    private double GetCpuUsage()
     {
         try
         {
@@ -77,7 +77,7 @@ public class StatisticsCollectorService : BackgroundService
         }
     }
 
-    private MemoryUsage GetMemoryUsageSafe()
+    private MemoryUsage GetMemoryUsage()
     {
         try
         {
@@ -97,15 +97,10 @@ public class StatisticsCollectorService : BackgroundService
 
     private async Task PublishStatisticsAsync(ServerStatistics stats)
     {
-        var topic = $"ServerStatistics.{_config.ServerIdentifier}";
-        var exchange = "ServerStatisticsExchange";
         var message = new Message<ServerStatistics>
         {
-            Topic = topic,
-            Content = stats,
-            Exchange = exchange
+            Content = stats
         };
-
         await _publisher.PublishAsync(message);
         Console.WriteLine($"Published stats for {_config.ServerIdentifier} at {DateTime.Now}");
     }

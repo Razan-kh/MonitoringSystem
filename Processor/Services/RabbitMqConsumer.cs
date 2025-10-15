@@ -41,7 +41,7 @@ public class RabbitMqConsumer : IMessageConsumer
             var json = Encoding.UTF8.GetString(body);
             try
             {
-                var message = JsonSerializer.Deserialize<Message<T>>(json); 
+                var message = JsonSerializer.Deserialize<Message<T>>(json);
 
                 if (message != null)
                 {

@@ -4,6 +4,7 @@ using MonitoringSystem.Shared.Interfaces;
 using MonitoringSystem.Shared.Models;
 using Microsoft.Extensions.Options;
 using MonitoringSystem.Processor.Models;
+using MonitoringSystem.Shared.Models;
 
 namespace MonitoringSystem.Processor.Services;
 
@@ -32,41 +33,43 @@ public class AnomalyDetector
 
             if (previous != null)
             {
-                await CheckMemoryAnomalyAsync(previous, current);
-                await CheckCpuAnomalyAsync(previous, current);
+                await Task.WhenAll(
+                    AlertMemoryAnomalyAsync(previous, current),
+                    AlertCpuAnomalyAsync(previous, current)
+                );
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error processing anomaly detection for {current.ServerIdentifier}: {ex.Message}");
+            Console.Write($"Error processing anomaly detection for {current.ServerIdentifier}: {ex.Message}");
         }
     }
 
-    private async Task CheckMemoryAnomalyAsync(ServerStatistics previous, ServerStatistics current)
+    private async Task AlertMemoryAnomalyAsync(ServerStatistics previous, ServerStatistics current)
     {
         if (current.MemoryUsage > previous.MemoryUsage * (1 + _config.MemoryUsageAnomalyThresholdPercentage))
         {
             await SendAlertAsync(
                 current.ServerIdentifier,
-                "MemoryAnomaly",
+                AnomalyType.MemoryAnomaly,
                 $"Memory jumped from {previous.MemoryUsage}MB to {current.MemoryUsage}MB",
                 current);
         }
     }
 
-    private async Task CheckCpuAnomalyAsync(ServerStatistics previous, ServerStatistics current)
+    private async Task AlertCpuAnomalyAsync(ServerStatistics previous, ServerStatistics current)
     {
         if (current.CpuUsage > previous.CpuUsage * (1 + _config.CpuUsageAnomalyThresholdPercentage))
         {
             await SendAlertAsync(
                 current.ServerIdentifier,
-                "CpuAnomaly",
+                AnomalyType.CpuAnomaly,
                 $"CPU jumped from {previous.CpuUsage}% to {current.CpuUsage}%",
                 current);
         }
     }
 
-    private async Task SendAlertAsync(string serverId, string type, string description, ServerStatistics stats)
+    private async Task SendAlertAsync(string serverId, AnomalyType type, string description, ServerStatistics stats)
     {
         await _notifier.SendAlertAsync(new AlertMessage
         {

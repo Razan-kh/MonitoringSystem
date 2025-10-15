@@ -19,13 +19,13 @@ var host = Host.CreateDefaultBuilder(args)
 
                 // Get hostName from configuration with fallback
                 var hostName = configuration["RabbitMQ:HostName"];
-                var exchangeName = configuration["RabbitMQ:ExchangeName"];
+              //  var exchangeName = configuration["RabbitMQ:ExchangeName"];
 
                 _ = services.AddSingleton<CpuUsageCollector>();
                 _ = services.AddSingleton<MemoryUsageCollector>();
 
                 _ = services.AddSingleton<IMessagePublisher>(provider =>
-                    new RabbitMqPublisher(hostName, exchangeName));
+                    new RabbitMqPublisher(hostName, configuration.GetSection("RabbitMq")));
 
                 _ = services.AddHostedService<StatisticsCollectorService>();
             })
